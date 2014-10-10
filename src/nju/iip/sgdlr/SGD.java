@@ -88,6 +88,7 @@ public class SGD {
         while(line != null){  
         	ArrayList<Double>Vector=getOneArticleVector(line);
         	classVector.add(Vector);
+        	line = br.readLine();
         }
         br.close();
 		
@@ -105,11 +106,14 @@ public class SGD {
 //			System.out.println(word+"="+keywordsMap.get(word));
 //		}
 		
-		ArrayList<Double>Vector=getOneArticleVector("我就说一句	充满天赋的森林狼队，今后会被哪些球队挖角呢？");
-		System.out.println(Vector.size());
-		for(int i=0;i<800;i++){
-			System.out.println(Vector.get(i));
-		}
+//		ArrayList<Double>Vector=getOneArticleVector("我就说一句	充满天赋的森林狼队，今后会被哪些球队挖角呢？");
+//		System.out.println(Vector.size());
+//		for(int i=0;i<801;i++){
+//			System.out.println(Vector.get(i));
+//		}
+		ArrayList<ArrayList<Double>>classVector=getOneClassVector("D:/dir/Basketball.txt");
+		System.out.println(classVector.size());
+		
 	}
 	
 
