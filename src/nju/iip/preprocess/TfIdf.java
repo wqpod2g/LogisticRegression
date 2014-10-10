@@ -3,7 +3,9 @@ package nju.iip.preprocess;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +17,9 @@ public class TfIdf {
 	/**
 	 * 特征向量所包含的关键词（每类中取tf*idf前100大的）
 	 */	
-	public static List<String> keywords=new ArrayList<String>();
+	public static Map<String,Double> keywords=new LinkedHashMap<String,Double>();
+	
+
 	
 	/**
 	 * 所有文件分词结果.key:文件名,value:该文件分词统计
@@ -69,8 +73,12 @@ public class TfIdf {
         if(segWordsResult==null || segWordsResult.size()==0){
     		return tf;
     	}
-        Long size=Long.valueOf(segWordsResult.size());
+        Long size=Long.valueOf(0);
+        
         Set<String> keys=segWordsResult.keySet();
+        for(String key: keys){
+        	size=size+segWordsResult.get(key);
+        }
         for(String key: keys){
         	Long value=segWordsResult.get(key);
         	tf.put(key, Double.valueOf(value)/size);
@@ -199,52 +207,43 @@ public class TfIdf {
     
     
     
-//    public static void main(String args[]){
-//    	Map<String, Map<String, Double>> allTfMap=allTf("D:/dir");
-//    	Map<String, Double> idf=idf(allSegsMap);
-//    	Map<String, Map<String, Double>> tfIdfMap=tfIdf(allTfMap,idf);
-//    	Set<String>classifies=tfIdfMap.keySet();
-//    	for(String classsfy:classifies){
-//    		Map<String,Double>tfIdf=tfIdfMap.get(classsfy);
-//    		List<Double>tfIdfList=new ArrayList<Double>();
-//    		Set<String>words=tfIdf.keySet();
-//    		for(String word:words){
-//    			tfIdfList.add(tfIdf.get(word));
-//    		}
-//    		Collections.sort(tfIdfList);
-//    		Double value=tfIdfList.get(tfIdfList.size()-100);
-//    		
-//    		int j=0;
-//    		for(String word:words){
-//    			if(tfIdf.get(word)>=value&&!keywords.contains(word)){
-//    				keywords.add(word);
-//    				j++;
-//    			}
-//    			if(j==80)
-//    				break;
-//    		}
-//    		
-//    		
-//    		
-//    	}
-//    	System.out.println(keywords.size());
-//    	for(String word:keywords){
-//    		System.out.println(word);
-//    	}
+    public static void main(String args[]){
+    	Map<String, Map<String, Double>> allTfMap=allTf("D:/dir");
+    	Map<String, Double> idf=idf(allSegsMap);
+    	Map<String, Map<String, Double>> tfIdfMap=tfIdf(allTfMap,idf);
+    	Set<String>classifies=tfIdfMap.keySet();
+    	for(String classsfy:classifies){
+    		Map<String,Double>tfIdf=tfIdfMap.get(classsfy);
+    		List<Double>tfIdfList=new ArrayList<Double>();
+    		Set<String>words=tfIdf.keySet();
+    		for(String word:words){
+    			tfIdfList.add(tfIdf.get(word));
+    		}
+    		Collections.sort(tfIdfList);
+    		Double value=tfIdfList.get(tfIdfList.size()-106);
+    		
+    		int j=0;
+    		for(String word:words){
+    			if(tfIdf.get(word)>=value&&!keywords.containsKey(word)){
+    				keywords.put(word,idfMap.get(word));
+    				
+    				j++;
+    			}
+    			if(j==80)
+    				break;
+    		}
+    		
+    		
+    		
+    	}
+    	System.out.println(keywords.size());
+    	Set<String>keyword=keywords.keySet();
+    	for(String word:keyword){
+    		//System.out.println(word);
+    		System.out.println(word+"="+keywords.get(word));
+    	}
     	
-//    	
-//    	Set<String>classify=tfIdfMap.keySet();
-//    	for(String file:classify){
-//    		System.out.println(file+"*************************************************************");
-//    		Map<String,Double>tf=tfIdfMap.get(file);
-//    		Set<String>words=tf.keySet();
-//    		for(String word:words){
-//    			System.out.println(word+"="+tf.get(word));
-//    		}
-//    		
-//    	}
-//    	System.out.println(allTf.size());
-//    	
-//    }
-//    
+   	
+    }
+    
 }

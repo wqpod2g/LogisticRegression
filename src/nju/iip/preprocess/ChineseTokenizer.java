@@ -31,11 +31,14 @@ public class ChineseTokenizer {
         Map<String, Long> words = new LinkedHashMap<String, Long>();
         try {
             while ((lexeme = iks.next()) != null) {
+            	if(lexeme.getLength()>1){
                 if (words.containsKey(lexeme.getLexemeText())) {
                     words.put(lexeme.getLexemeText(), words.get(lexeme.getLexemeText()) + 1);
                 } else {
                     words.put(lexeme.getLexemeText(), 1L);
                 }
+                
+            	}
             }       
         }catch(IOException e) {
             e.printStackTrace();
