@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +23,13 @@ import nju.iip.preprocess.Tools;
 
 public class SGD {
 	
+	private static int iterationTimes=10;//迭代次数
+	
+	private static Double alpha=0.0000001;//步长
 	
 	private static String SamplePath="D:/lily";//文本路径
+	
+	private static ArrayList<Double>accuracyList=new ArrayList<Double>();//元素为每折准确率
 	
 	/**
 	 * 整个样本向量，值为tf*idf
@@ -66,7 +70,7 @@ public class SGD {
 	 */
 	public static ArrayList<Double>getOneArticleVector(String content) throws IOException{
 		ArrayList<Double>Vector=new ArrayList<Double>();
-		Vector.add(Double.valueOf(1));
+		Vector.add(1.0);
 		Map<String,Long>articleWordsMap=ChineseTokenizer.segStr(content);
 		Set<String>words=articleWordsMap.keySet();
 		Long size=Long.valueOf(0);
@@ -99,6 +103,7 @@ public class SGD {
 		ArrayList<ArrayList<Double>>classVector=new ArrayList<ArrayList<Double>>();
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(classification), "UTF8")); 
         String line = br.readLine();
+      
         while(line != null){  
         	
         	ArrayList<Double>Vector=getOneArticleVector(line);
@@ -159,7 +164,7 @@ public class SGD {
 	 * @param x
 	 * @return
 	 */
-	public static Double hxValue(ArrayList<Double>theta,ArrayList<Double>x){
+	public static Double hxValue(ArrayList<Double>x,ArrayList<Double>theta){
 		double hx;
 		hx=1.0/(1.0+Math.exp(-vectorProduct(theta,x)));
 		return hx;
@@ -175,8 +180,9 @@ public class SGD {
 	 */
 	public static ArrayList<Double> theta2(Double y,ArrayList<Double>theta,ArrayList<Double>x){
 		ArrayList<Double>theta2=new ArrayList<Double>();
+		Double yh=alpha*(y-hxValue(x,theta));
 		for(int i=0;i<801;i++){
-			theta2.add(theta.get(i)+0.0001*(y-hxValue(theta,x))*x.get(i));
+			theta2.add(theta.get(i)+yh*x.get(i));
 		}
 		
 		return theta2;
@@ -197,17 +203,27 @@ public class SGD {
 		}
 		
 		Double y;
+		
+		for(int n=0;n<iterationTimes;n++){
+		
+//		if(n<10)
+//			alpha=0.000001;
+//		else
+//			alpha=0.000000001;
 		Set<String>classlist=TrainSample.keySet();
 		for(String classname:classlist){
 			if(classname.equals(classification))
 				y=1.0;
 			else
 				y=0.0;
+			
 			ArrayList<ArrayList<Double>>classVector=TrainSample.get(classname);
 			for(int i=0;i<classVector.size();i++){
 				theta=theta2(y,theta,classVector.get(i));
 			}
 			
+		}
+		
 		}
 		
 		
@@ -223,14 +239,17 @@ public class SGD {
 	 * @throws IOException
 	 */
 	public static Map<String,ArrayList<Double>>getAllClassTheta(Map<String,ArrayList<ArrayList<Double>>> TrainSample) throws FileNotFoundException, IOException{
-		Map<String,ArrayList<Double>>allClassTheta=new HashMap<String,ArrayList<Double>>();
+		//System.out.println("******************************theta训练开始！*************************************");
+		Map<String,ArrayList<Double>>allClassTheta=new LinkedHashMap<String,ArrayList<Double>>();
 		Set<String>classList=TrainSample.keySet();
 		for(String classname:classList){
-			allClassTheta.put(classname, getOneClassTheta(classname,TrainSample));
-			System.out.println("theta------"+classname+"   finish!");
+			ArrayList<Double>theta=getOneClassTheta(classname,TrainSample);
+			allClassTheta.put(classname, theta);
+			//System.out.println("theta------"+classname+"   finish!");
+			//System.out.println(theta);
 		}
 		
-		System.out.println("******************************theta训练结束！*************************************");
+		//System.out.println("******************************theta训练结束！*************************************");
 		return allClassTheta;
 	}
 	
@@ -241,32 +260,21 @@ public class SGD {
 	 * @return 该帖子属于哪一类
 	 */
 	public static String getOneVectorTestResult(ArrayList<Double>x,Map<String,ArrayList<Double>>allClasstheta){
-		String result=null;
 		//Map<String,Double>resultMap=new HashMap<String,Double>();
 		Set<String>classnames=allClasstheta.keySet();
-		int i=0;
-		Double value = null ;
+		String classifierName="";
+		Double result=0.0;
 		for(String classname:classnames){
-			//resultMap.put(classname,vectorProduct(allClasstheta.get(classname),x));
-			if(i==0){
-				value=vectorProduct(allClasstheta.get(classname),x);
-				result=classname;
-			}
-			else{
-				if(vectorProduct(allClasstheta.get(classname),x)>=value){
-					value=vectorProduct(allClasstheta.get(classname),x);
-					result=classname;
-				}
-				
-				
-				
-				
-			}
-			System.out.println(value);
-			i++;		
+			Double classifierValue=hxValue(x,allClasstheta.get(classname));
+			//System.out.println(classifierValue);
+		    if(classifierValue>=result){
+		    	result=classifierValue;
+		    	classifierName=classname;
+		    }
 		}
-		
-		return result;	
+		//System.out.println(classifierName);
+		//System.out.println(value);
+		return classifierName;	
 	}
 	
 	
@@ -282,27 +290,21 @@ public class SGD {
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
 	 */
-	public static String oneTimeTenCross(Map<String,ArrayList<ArrayList<Double>>> testSample,Map<String,ArrayList<ArrayList<Double>>> TrainSample) throws FileNotFoundException, IOException{
+	public static Double oneTimeTenCross(Map<String,ArrayList<ArrayList<Double>>> testSample,Map<String,ArrayList<ArrayList<Double>>> TrainSample) throws FileNotFoundException, IOException{
 		
-		Map<String,ArrayList<Double>>theta=getAllClassTheta(TrainSample);
+		Map<String,ArrayList<Double>>allClasstheta=getAllClassTheta(TrainSample);
 		Set<String>classnames=testSample.keySet();
 		int discount=0;
-		int j=1;
 		for(String classname:classnames){
 			ArrayList<ArrayList<Double>>classVector=testSample.get(classname);
 			for(int i=0;i<classVector.size();i++){
-				if(!classname.equals(getOneVectorTestResult(classVector.get(i),theta))){
+				if(!classname.equals(getOneVectorTestResult(classVector.get(i),allClasstheta))){
 					discount++;
-					System.out.println(j+"未命中！当前未命中数:"+discount);
 				}
-				else
-					System.out.println(j);
-				
-				j++;
 			}
 		}
 		
-		return getPercent(100-discount,100);
+		return (100-discount)/100.0;
 		
 	
 	}
@@ -318,8 +320,10 @@ public class SGD {
 	
 	
 	public static void process() throws FileNotFoundException, IOException{
-		Map<String,ArrayList<ArrayList<Double>>> testSample=new HashMap<String,ArrayList<ArrayList<Double>>>();
-		Map<String,ArrayList<ArrayList<Double>>> TrainSample=new HashMap<String,ArrayList<ArrayList<Double>>>();
+		for(int j=0;j<10;j++){
+		
+		Map<String,ArrayList<ArrayList<Double>>> testSample=new LinkedHashMap<String,ArrayList<ArrayList<Double>>>();
+		Map<String,ArrayList<ArrayList<Double>>> TrainSample=new LinkedHashMap<String,ArrayList<ArrayList<Double>>>();
 		
 		Set<String>classnames=allVector.keySet();
 		for(String classname:classnames){
@@ -328,7 +332,7 @@ public class SGD {
 			ArrayList<ArrayList<Double>>TrainSampleclassVector=new ArrayList<ArrayList<Double>>();
 			//System.out.println("#######"+classVector.size());
 			for(int i=0;i<100;i++){
-				if(i>=90&&i<100)
+				if(i>=j*10&&i<(j+1)*10)
 					testSampleclassVector.add(classVector.get(i));
 				else
 					TrainSampleclassVector.add(classVector.get(i));
@@ -338,8 +342,16 @@ public class SGD {
 			testSample.put(classname, testSampleclassVector);
 			TrainSample.put(classname, TrainSampleclassVector);
 		}
-		System.out.println("样本划分完毕！");
-		System.out.println("命中率为:"+oneTimeTenCross(testSample,TrainSample));
+		Double accuracy=oneTimeTenCross(testSample,TrainSample);
+		System.out.println("第"+(j+1)+"折验证结束!命中率为:"+accuracy);
+		accuracyList.add(accuracy);
+		}
+		Double sum=0.0;
+		for(int i=0;i<10;i++){
+			sum=sum+accuracyList.get(i);
+		}
+		Double mean=sum/10;
+		System.out.println("平均准确率为:"+mean);
 		
 	}
 	

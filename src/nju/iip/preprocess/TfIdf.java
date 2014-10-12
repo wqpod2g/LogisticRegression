@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class TfIdf {
 	
-	private static String SamplePath="D:/lily";//文本路径
+	private static String SamplePath="lily";//文本路径
 
 	/**
 	 * 特征向量所包含的关键词（每类中取tf*idf前100大的）
