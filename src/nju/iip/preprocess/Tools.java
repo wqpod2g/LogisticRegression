@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +92,16 @@ public class Tools {
     	
     	return deviation ;
     }
+    
+    
+    public static String getPercent(int x,int total){
+		   String result="";//接受百分比的值
+		   double x1=x*1.0;
+		   double tempresult=x1/total;
+		   DecimalFormat df1 = new DecimalFormat("0%");    //##.00%   百分比格式，后面不足2位的用0补齐
+		   result= df1.format(tempresult);  
+		   return result;
+		}
     
 //    public static void main(String args[]) throws FileNotFoundException, IOException{
 //    	List<String>file=readDirs("D:\\dir");

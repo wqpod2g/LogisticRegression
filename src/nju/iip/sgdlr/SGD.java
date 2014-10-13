@@ -134,13 +134,7 @@ public class SGD {
 		return allVector;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	
 	/**
@@ -205,11 +199,6 @@ public class SGD {
 		Double y;
 		
 		for(int n=0;n<iterationTimes;n++){
-		
-//		if(n<10)
-//			alpha=0.000001;
-//		else
-//			alpha=0.000000001;
 		Set<String>classlist=TrainSample.keySet();
 		for(String classname:classlist){
 			if(classname.equals(classification))
@@ -245,8 +234,7 @@ public class SGD {
 		for(String classname:classList){
 			ArrayList<Double>theta=getOneClassTheta(classname,TrainSample);
 			allClassTheta.put(classname, theta);
-			//System.out.println("theta------"+classname+"   finish!");
-			//System.out.println(theta);
+			
 		}
 		
 		//System.out.println("******************************theta训练结束！*************************************");
@@ -309,14 +297,7 @@ public class SGD {
 	
 	}
 	
-	public static String getPercent(int x,int total){
-		   String result="";//接受百分比的值
-		   double x1=x*1.0;
-		   double tempresult=x1/total;
-		   DecimalFormat df1 = new DecimalFormat("0%");    //##.00%   百分比格式，后面不足2位的用0补齐
-		   result= df1.format(tempresult);  
-		   return result;
-		}
+	
 	
 	
 	public static void process() throws FileNotFoundException, IOException{
@@ -330,15 +311,12 @@ public class SGD {
 			ArrayList<ArrayList<Double>>classVector=allVector.get(classname);
 			ArrayList<ArrayList<Double>>testSampleclassVector=new ArrayList<ArrayList<Double>>();
 			ArrayList<ArrayList<Double>>TrainSampleclassVector=new ArrayList<ArrayList<Double>>();
-			//System.out.println("#######"+classVector.size());
 			for(int i=0;i<100;i++){
 				if(i>=j*10&&i<(j+1)*10)
 					testSampleclassVector.add(classVector.get(i));
 				else
 					TrainSampleclassVector.add(classVector.get(i));
 			}
-			//System.out.println("#######"+testSampleclassVector.size());
-			//System.out.println("#######"+TrainSampleclassVector.size());
 			testSample.put(classname, testSampleclassVector);
 			TrainSample.put(classname, TrainSampleclassVector);
 		}
@@ -353,51 +331,14 @@ public class SGD {
 	}
 	
 	
-	
-	
-	
-	
-	
 	public static void main(String args[]) throws IOException{
-//		keywordsMap=getKeyWordsMap();
-//		Set<String>words=keywordsMap.keySet();
-//		for(String word:words){
-//			System.out.println(word+"="+keywordsMap.get(word));
-//		}
-		
-//		ArrayList<Double>Vector=getOneArticleVector("我就说一句	充满天赋的森林狼队，今后会被哪些球队挖角呢？");
-//		System.out.println(Vector.size());
-//		for(int i=0;i<801;i++){
-//			System.out.println(Vector.get(i));
-//		}
-		//ArrayList<ArrayList<Double>>classVector=getOneClassVector("D:/dir/Girls.txt");
-		
 		getAllVector();
-		//System.out.println(allVector.size());
 		System.out.println("预处理结束！");
-		
-		
-//		long startTime=System.currentTimeMillis();   //获取开始时间
-//		Map<String,ArrayList<Double>>allClassTheta=getAllClassTheta(allVector);
-//		System.out.println(allClassTheta.size());
-//		long endTime=System.currentTimeMillis(); //获取结束时间   
-//		System.out.println("样本训练时间： "+(endTime-startTime)/1000+"s");
 		long startTime=System.currentTimeMillis();   //获取开始时间
 		process();
 		long endTime=System.currentTimeMillis(); //获取结束时间   
 		System.out.println("时间： "+(endTime-startTime)/1000+"s");
-//		ArrayList<Double>vector=allClassTheta.get("D:"+File.separator+"dir"+File.separator+"JobExpress.txt");
-//		System.out.println(vector.size());
-//		for(int i=0;i<801;i++){
-//			System.out.println(vector.get(i));
-//		}
 		
-		
-//		Set<String>list=allVector.keySet();
-//		for(String article:list ){
-//			ArrayList<ArrayList<Double>>classVector=allVector.get(article);
-//			System.out.println(article+"  "+classVector.size());
-//		}
 	}
 	
 
