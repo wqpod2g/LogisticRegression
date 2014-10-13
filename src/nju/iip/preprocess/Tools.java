@@ -62,6 +62,35 @@ public class Tools {
     }
     
     
+    /**
+     * @decription 计算平均值
+     * @param list
+     * @return
+     */
+    public static Double getMean(ArrayList<Double>list){
+    	Double sum=0.0;
+		for(int i=0;i<list.size();i++){
+			sum=sum+list.get(i);
+		}
+		Double mean=sum/10;
+		return mean;
+    }
+    
+    /**
+     * @description 计算标准差
+     * @param list
+     * @return
+     */
+    public static Double getDeviation(ArrayList<Double>list){
+    	Double mean=getMean(list);
+    	Double deviation=0.0;
+    	for(int i=0;i<list.size();i++){
+    		deviation=deviation+(list.get(i)-mean)*(list.get(i)-mean);
+    	}
+    	deviation=Math.sqrt(deviation/(list.size()-1));
+    	
+    	return deviation ;
+    }
     
 //    public static void main(String args[]) throws FileNotFoundException, IOException{
 //    	List<String>file=readDirs("D:\\dir");

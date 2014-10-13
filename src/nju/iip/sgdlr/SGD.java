@@ -346,12 +346,9 @@ public class SGD {
 		System.out.println("第"+(j+1)+"折验证结束!命中率为:"+accuracy);
 		accuracyList.add(accuracy);
 		}
-		Double sum=0.0;
-		for(int i=0;i<10;i++){
-			sum=sum+accuracyList.get(i);
-		}
-		Double mean=sum/10;
-		System.out.println("平均准确率为:"+mean);
+		
+		System.out.println("平均准确率为:"+Tools.getMean(accuracyList));
+		System.out.println("标准差为:"+Tools.getDeviation(accuracyList));
 		
 	}
 	
