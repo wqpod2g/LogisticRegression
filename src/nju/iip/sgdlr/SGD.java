@@ -27,7 +27,7 @@ public class SGD {
 	
 	private static Double alpha=0.0000001;//步长
 	
-	private static String SamplePath="D:/lily";//文本路径
+	private static String SamplePath="D:/dir";//文本路径
 	
 	private static ArrayList<Double>accuracyList=new ArrayList<Double>();//元素为每折准确率
 	
